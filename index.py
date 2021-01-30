@@ -15,7 +15,7 @@ tutorialMode = False
 def getNewPuzzle():
     #Select a random Puzzle
     puzzle_num = random.randint(0, 1102217)
-    with open('lichess_db_puzzle.csv', 'r') as file:
+    with open('./lichess_db_puzzle.csv', 'r') as file:
         reader = csv.reader(file)
         file_reader = enumerate(reader)
         for i, row in file_reader:
