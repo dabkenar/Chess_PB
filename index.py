@@ -72,7 +72,7 @@ async def on_message(message):
         await message.channel.send(file=discord.File('./output/result.png'))
 
         #Directory cleanup
-        os.system('rm -rf ./output/*')
+        os.system('rm -rf ./output/result.png')
 
     if (message.content.startswith('.hint')):
         await message.channel.send('Try looking at the ' + str(newPuzzle.moves[newPuzzle.currentMove][0:2]) + ' square')
@@ -94,7 +94,7 @@ async def on_message(message):
         await message.channel.send(file=discord.File('./output/result.png'))
 
         #Directory cleanup
-        os.system('rm -rf ./output/*')
+        os.system('rm -rf ./output/result.png')
 
     if (message.content.startswith('.move')):
         move = message.content.split(' ')[1]
@@ -110,7 +110,7 @@ async def on_message(message):
                 mainFTP(tutorialPuzzle.fen.fen_array)
                 await message.channel.send(file=discord.File('./output/result.png'))
                 #Directory cleanup
-                os.system('rm -rf ./output/*')
+                os.system('rm -rf ./output/result.png')
                 return
             elif (processTutorialMove(move) == 2):
                 await message.channel.send('A brilliant move! You\'ll be a grandmaster in no time. Now for the final lesson. In chess when a pawn makes it to the other side of the board you can promote it to be a Queen (Q/q), a Rook (R/r), a Bishop (B/b) or a Knight (N/n). In order to execute a pawn promotion, you must use the move command to move your pawn 1 square forward, but add the corresponding letter of the piece you would like to promote to at the end of the command (ex. a7a8N) If you are playing the white pieces, the letter should be Upper Case. If you\'e playing the black pieces, it should be lower case. Now try promoting your Pawn to a Queen!')
@@ -122,7 +122,7 @@ async def on_message(message):
                 mainFTP(tutorialPuzzle.fen.fen_array)
                 await message.channel.send(file=discord.File('./output/result.png'))
                 #Directory cleanup
-                os.system('rm -rf ./output/*')
+                os.system('rm -rf ./output/result.png')
                 return
             elif (processTutorialMove(move) == 3):
                 await message.channel.send(message.author.name + ' Win!')
@@ -138,7 +138,7 @@ async def on_message(message):
                 await message.channel.send('Find ' + str(newPuzzle.movesToWin) + ' ' + pluralMoves(newPuzzle.movesToWin) + ' to complete puzzle')
                 await message.channel.send(file=discord.File('./output/result.png'))
                 #Directory cleanup
-                os.system('rm -rf ./output/*')
+                os.system('rm -rf ./output/result.png')
                 return
             elif (processTutorialMove(move) == 4):
                 await message.channel.send('Incorrect move, try again crelbis')
@@ -178,7 +178,7 @@ async def on_message(message):
             await message.channel.send(file=discord.File('./output/result.png'))
 
             #Directory cleanup
-            os.system('rm -rf ./output/*')
+            os.system('rm -rf ./output/result.png')
         else:
             await message.channel.send('Incorrect move, try again')
 
