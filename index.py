@@ -3,18 +3,41 @@ from discord.ext import commands, tasks
 import os, shutil
 import subprocess
 import csv
+import boto3
 import random
+import pandas as pd
 from Puzzle import Puzzle
 from Fen import Fen
 from main import mainFTP
 
+# s3 = boto3.resource(
+#     service_name='s3',
+#     region_name='us-east-2',
+#     aws_access_key_id='AKIA43ZRUWSVMFZYJVWG',
+#     aws_secret_access_key='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'
+# )
 client = commands.Bot(command_prefix = '.')
 tutorialPuzzle = Puzzle(['NgJOw', '8/p4P2/8/8/3B4/1R6/8/8 b - - 0 1', 'a7a6 b3b8 a6a5 d4g7 a5a4 f7f8q', '1303', '76', '86', '353', 'endgame mate mateIn2 short', 'https://lichess.org/sn1G465d#87'])
 tutorialMode = False
+# puzzleDB = s3.Bucket('chess-pb').Object('lichess_db_puzzle.csv').get()
+# url = 'https://raw.githubusercontent.com/dabkenar/PUZZLE_FILE_HOST/main/lichess_db_puzzle.csv'
+# puzzleDF = pd.read_csv(url, memory_map=True)
+# col_names = ['Id',
+#              'FEN',
+#              'Moves',
+#              'Popularity',
+#              '1',
+#              '2',
+#              '3',
+#              '4',
+#              '5',]
+
+# row = pd.read_csv(puzzleDB['Body'], skiprows=random.randint(0, 562312), nrows=1, header=None, names=col_names)
+# print(row)
 
 def getNewPuzzle():
     #Select a random Puzzle
-    puzzle_num = random.randint(0, 1102217)
+    puzzle_num = random.randint(0, 562312)
     with open('./lichess_db_puzzle.csv', 'r') as file:
         reader = csv.reader(file)
         file_reader = enumerate(reader)
@@ -25,6 +48,7 @@ def getNewPuzzle():
                 return row
 
 #Get a new dummy puzzle
+print('hello')
 newPuzzle = Puzzle(getNewPuzzle())
 newPuzzle.complete = True
 
@@ -54,11 +78,11 @@ async def on_message(message):
         await message.channel.send('Try looking at the ' + str(newPuzzle.moves[newPuzzle.currentMove][0:2]) + ' square')
 
     if (message.content.startswith('.chess')):
-        if (newPuzzle.complete):
+        if (not newPuzzle.complete):
+            await message.channel.send('You still have a puzzle to complete')
+        else:
             #Generate New Puzzle
             newPuzzle = Puzzle(getNewPuzzle())
-        else:
-            await message.channel.send('You still have a puzzle to complete')
         
         #Send Puzzle image and info
         mainFTP(newPuzzle.fen.fen_array)
@@ -124,7 +148,7 @@ async def on_message(message):
                 return
 
         if (newPuzzle.complete):
-            await message.channel.send('Sorry, check back tomorrow for a new puzzle')
+            await message.channel.send('No Active puzzle, use the .chess command to request another')
             return
         if (not isValidMove(move)):
             await message.channel.send('Invalid Move Syntax')
