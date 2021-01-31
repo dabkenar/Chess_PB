@@ -3,9 +3,7 @@ from discord.ext import commands, tasks
 import os, shutil
 import subprocess
 import csv
-import boto3
 import random
-import pandas as pd
 from Puzzle import Puzzle
 from Fen import Fen
 from main import mainFTP
@@ -92,7 +90,7 @@ async def on_message(message):
                 os.system('rm -rf ./output/result.png')
                 return
             elif (processTutorialMove(move) == 2):
-                await message.channel.send('A brilliant move! You\'ll be a grandmaster in no time. Now for the final lesson. In chess when a pawn makes it to the other side of the board you can promote it to be a Queen (Q/q), a Rook (R/r), a Bishop (B/b) or a Knight (N/n). In order to execute a pawn promotion, you must use the move command to move your pawn 1 square forward, but add the corresponding letter of the piece you would like to promote to at the end of the command (ex. a7a8N) If you are playing the white pieces, the letter should be Upper Case. If you\'e playing the black pieces, it should be lower case. Now try promoting your Pawn to a Queen!')
+                await message.channel.send('A brilliant move! You\'ll be a grandmaster in no time. Now for the final lesson. In chess when a pawn makes it to the other side of the board you can promote it to be a Queen (q), a Rook (r), a Bishop (b) or a Knight (n). In order to execute a pawn promotion, you must use the move command to move your pawn 1 square forward, but add the corresponding letter of the piece you would like to promote to at the end of the command (ex. a7a8n). Now try promoting your Pawn to a Queen!')
                 #Execute User Move
                 tutorialPuzzle.makeMove(tutorialPuzzle.moves[tutorialPuzzle.currentMove])
                 #Execute Counter Move
@@ -164,10 +162,7 @@ async def on_message(message):
 def isValidMove(move):
     legal_files = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'}
     legal_ranks = { '1', '2', '3', '4', '5', '6', '7', '8'}
-    if (newPuzzle.color == 'w'):
-        legal_promotions = {'Q', 'R', 'B', 'N'}
-    else:
-        legal_promotions = {'q', 'r', 'b', 'n'}
+    legal_promotions = {'q', 'r', 'b', 'n'}
     
     if (len(move)== 4):
         if(move[0] in legal_files and move[2] in legal_files):

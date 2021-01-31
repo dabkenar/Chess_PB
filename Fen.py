@@ -49,7 +49,7 @@ class Fen:
             #Replace ‘1’ or piece character in DES with LOC piece character or PP character, if applicable
             if (len(move_DES) == 3):
                 print('pawn promotion')
-                new_expanded_orig_FEN_DES = expanded_orig_FEN_DES[:moveHelperFunctions.letterToInt(move_DES[0])] + move_DES[2] + expanded_orig_FEN_DES[moveHelperFunctions.letterToInt(move_DES[0]) + 1:]
+                new_expanded_orig_FEN_DES = expanded_orig_FEN_DES[:moveHelperFunctions.letterToInt(move_DES[0])] + str(move_DES[2]).capitalize() + expanded_orig_FEN_DES[moveHelperFunctions.letterToInt(move_DES[0]) + 1:]
             else:
                 print('normal move')
                 new_expanded_orig_FEN_DES = expanded_orig_FEN_DES[:moveHelperFunctions.letterToInt(move_DES[0])] + moving_piece + expanded_orig_FEN_DES[moveHelperFunctions.letterToInt(move_DES[0]) + 1:]
