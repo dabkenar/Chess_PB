@@ -118,7 +118,7 @@ async def on_message(message):
                 os.system('rm -rf ./output/result.png')
                 return
             elif (processTutorialMove(move) == 4):
-                await message.channel.send('Incorrect move, try again crelbis')
+                await message.channel.send('Incorrect move')
                 return
             elif (processTutorialMove(move) == 5):
                 await message.channel.send('Invalid Move Syntax')
@@ -194,7 +194,7 @@ def processTutorialMove(move):
             return 1
         elif (move == 'd4g7' and tutorialPuzzle.currentMove == 3):
             return 2
-        elif (move == 'f7f8Q' and tutorialPuzzle.currentMove == 5):
+        elif (move == 'f7f8q' and tutorialPuzzle.currentMove == 5):
             return 3
         else:
             return 4
