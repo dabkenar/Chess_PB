@@ -11,6 +11,8 @@ class Fen:
         self.fen_array = fen_array
 
     def makeMove(self, move):
+        #Initialize Variable
+        new_FEN_Board_ARR = []
         #Get FEN board representation
         orig_FEN_Board = self.board
 
