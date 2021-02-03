@@ -137,7 +137,6 @@ async def on_message(message):
             #Check if Puzzle is complete
             if (newPuzzle.currentMove == len(newPuzzle.moves)): 
                 await message.channel.send(message.author.name + ' Win!')
-                newPuzzle.makeMove(newPuzzle.moves[newPuzzle.currentMove])
                 mainFTP(newPuzzle.fen.fen_array)
                 await message.channel.send(file=discord.File('./output/result.png'))
                 #Directory cleanup
@@ -149,7 +148,6 @@ async def on_message(message):
             #Check if Puzzle is complete
             if (newPuzzle.currentMove == len(newPuzzle.moves)): 
                 await message.channel.send(message.author.name + ' Win!')
-                newPuzzle.makeMove(newPuzzle.moves[newPuzzle.currentMove])
                 mainFTP(newPuzzle.fen.fen_array)
                 await message.channel.send(file=discord.File('./output/result.png'))
                 #Directory cleanup
