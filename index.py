@@ -25,7 +25,6 @@ def getNewPuzzle():
                 return row
 
 #Get a new dummy puzzle
-print('hello')
 newPuzzle = Puzzle(getNewPuzzle())
 newPuzzle.complete = True
 
@@ -40,7 +39,7 @@ async def on_message(message):
     global tutorialPuzzle
     if (message.content.startswith('.help')):
         tutorialMode = True
-        await message.channel.send('Hello, I am the Chess Puzzle of the Day Discord bot. Everyday I will provide this channel with a chess Puzzle.')
+        await message.channel.send('Hello, I am the Chess Puzzle Blaster Discord bot.')
         await message.channel.send('To play this puzzle you must suggest moves with the .move command and provide the initial square of the piece you would like to move, followed by its destination square. Remember, each square of the board can be identified using an alphanumerical system. Here is an image for reference:')
         await message.channel.send(file=discord.File('images/tutorial_board.png'))
         await message.channel.send('You can try this out with this puzzle right here. You can move your rook to b8 with the move command. The current location is b3 and the desired destination is b8 so your move command should look like: ".move b3b8" Try executing that command now')
@@ -138,6 +137,11 @@ async def on_message(message):
             #Check if Puzzle is complete
             if (newPuzzle.currentMove == len(newPuzzle.moves)): 
                 await message.channel.send(message.author.name + ' Win!')
+                newPuzzle.makeMove(newPuzzle.moves[newPuzzle.currentMove])
+                mainFTP(newPuzzle.fen.fen_array)
+                await message.channel.send(file=discord.File('./output/result.png'))
+                #Directory cleanup
+                os.system('rm -rf ./output/*')
                 newPuzzle.complete = True
                 return
             #Execute Counter Move
@@ -145,6 +149,11 @@ async def on_message(message):
             #Check if Puzzle is complete
             if (newPuzzle.currentMove == len(newPuzzle.moves)): 
                 await message.channel.send(message.author.name + ' Win!')
+                newPuzzle.makeMove(newPuzzle.moves[newPuzzle.currentMove])
+                mainFTP(newPuzzle.fen.fen_array)
+                await message.channel.send(file=discord.File('./output/result.png'))
+                #Directory cleanup
+                os.system('rm -rf ./output/*')
                 newPuzzle.complete = True
                 return
             
