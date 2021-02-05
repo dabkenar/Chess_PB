@@ -4,13 +4,17 @@ import os, shutil
 import subprocess
 import csv
 import random
+from operator import itemgetter
 from Puzzle import Puzzle
 from Fen import Fen
+from Blast import Blast
 from main import mainFTP
 
 client = commands.Bot(command_prefix = '.')
 tutorialPuzzle = Puzzle(['NgJOw', '8/p4P2/8/8/3B4/1R6/8/8 b - - 0 1', 'a7a6 b3b8 a6a5 d4g7 a5a4 f7f8q', '1303', '76', '86', '353', 'endgame mate mateIn2 short', 'https://lichess.org/sn1G465d#87'])
+newBlast = Blast(0)
 tutorialMode = False
+blastMode = False
 
 def getNewPuzzle():
     #Select a random Puzzle
@@ -35,8 +39,10 @@ async def on_ready():
 @client.event
 async def on_message(message):
     global newPuzzle
-    global tutorialMode
     global tutorialPuzzle
+    global newBlast
+    global tutorialMode
+    global blastMode
     if (message.content.startswith('.help')):
         tutorialMode = True
         await message.channel.send('Hello, I am the Chess Puzzle Blaster Discord bot.')
@@ -54,6 +60,8 @@ async def on_message(message):
         await message.channel.send('Try looking at the ' + str(newPuzzle.moves[newPuzzle.currentMove][0:2]) + ' square')
 
     if (message.content.startswith('.chess')):
+        if (blastMode):
+            await message.channel.send('There is an active puzzle blast with ' + str(newBlast.puzzleMax - newBlast.currentPuzzle) + ' puzzles to go')
         if (not newPuzzle.complete):
             await message.channel.send('You still have a puzzle to complete')
         else:
@@ -71,10 +79,41 @@ async def on_message(message):
 
         #Directory cleanup
         os.system('rm -rf ./output/*')
+    
+    if (message.content.startswith('.blast')):
+        try:
+            blastSize = int(message.content.split(' ')[1])
+        except:
+            await message.channel.send('Puzzle Blast size is required: Use syntax .blast X')
+            return
+        if (blastSize < 3):
+            await message.channel.send('Minimum blast size is 3 puzzles, try again')
+            return
+        #Enter the Puzzle Blasting Realm
+        blastMode = True
+        #Get number of puzzles and Initialize blast Session
+        newBlast = Blast(blastSize)
+        await message.channel.send('Entering the Blasting Realm: ' + str(newBlast.puzzleMax) + ' Puzzle Blast')
+        #Generate New Puzzle
+        newPuzzle = Puzzle(getNewPuzzle())
+        #Send Puzzle image and info
+        mainFTP(newPuzzle.fen.fen_array)
+        if (newPuzzle.color == 'w'):
+            await message.channel.send('White to Move')
+        else:
+            await message.channel.send('Black to Move')
+        await message.channel.send('Find ' + str(newPuzzle.movesToWin) + ' ' + pluralMoves(newPuzzle.movesToWin) + ' to complete the puzzle')
+        await message.channel.send(file=discord.File('./output/result.png'))
+
+        #Directory cleanup
+        os.system('rm -rf ./output/*')
 
     if (message.content.startswith('.move')):
-        move = message.content.split(' ')[1]
-
+        try:
+            move = message.content.split(' ')[1]
+        except:
+            await message.channel.send('No Move specified: Use syntax .move a1b2')
+            return
         if (tutorialMode):
             if (processTutorialMove(move) == 1):
                 await message.channel.send('Nice job. As you can see you have moved your rook to b8 and your opponent has moved their pawn to a5. Whenever you enter the correct move, I will execute it and your opponents response move. Then I will send you a new image of the board. Now try moving your bishop to g7. This time you\'ll have to figure out the command on your own.')
@@ -123,6 +162,7 @@ async def on_message(message):
                 await message.channel.send('Invalid Move Syntax')
                 return
 
+            
         if (newPuzzle.complete):
             await message.channel.send('No Active puzzle, use the .chess command to request another')
             return
@@ -130,12 +170,52 @@ async def on_message(message):
             await message.channel.send('Invalid Move Syntax')
             return
         elif (isValidMove(move) and move == newPuzzle.moves[newPuzzle.currentMove]):
+            if (blastMode):
+                userIndex = next((index for (index, scoreCard) in enumerate(newBlast.scoreBoard) if scoreCard['name'] == message.author.name), None)
+                if userIndex == None:
+                    #Entry does not exist
+                    newBlast.scoreBoard.append({
+                        'name': message.author.name,
+                        'score': 1
+                    })
+                else:
+                    newBlast.scoreBoard[userIndex]['score'] += 1
+                print(newBlast.scoreBoard)
             #Update Moves to win
             newPuzzle.movesToWin -= 1
             #Execute User Move
             newPuzzle.makeMove(newPuzzle.moves[newPuzzle.currentMove])
             #Check if Puzzle is complete
-            if (newPuzzle.currentMove == len(newPuzzle.moves)): 
+            if (newPuzzle.currentMove == len(newPuzzle.moves)):
+                if (blastMode):
+                    if (newBlast.currentPuzzle == newBlast.puzzleMax):
+                        #Blast complete announce winners
+                        blastMode = False
+                        await message.channel.send('Blast complete, Post Game Summary:')
+                        sortedScoreBoard = sorted(newBlast.scoreBoard, key=itemgetter('score'), reverse=True)
+                        summary = ''
+                        for i, scoreCard in enumerate(sortedScoreBoard):
+                            summary += '{position}. {user} : {score} {moves} \n'.format(position=str(i + 1), user=scoreCard['name'], score=scoreCard['score'], moves=pluralMoves(scoreCard['score']))
+                        await message.channel.send(summary) 
+                        return
+                    else:
+                        #Puzzle complete, blast continues
+                        await message.channel.send('Puzzle ' + str(newBlast.currentPuzzle) + ' complete, Next Puzzle: ')
+                        #Update Blast
+                        newBlast.currentPuzzle += 1
+                        #Get New Puzzle
+                        newPuzzle = Puzzle(getNewPuzzle())
+                        #Send Puzzle image and info
+                        mainFTP(newPuzzle.fen.fen_array)
+                        if (newPuzzle.color == 'w'):
+                            await message.channel.send('White to Move')
+                        else:
+                            await message.channel.send('Black to Move')
+                        await message.channel.send('Find ' + str(newPuzzle.movesToWin) + ' ' + pluralMoves(newPuzzle.movesToWin) + ' to complete the puzzle')
+                        await message.channel.send(file=discord.File('./output/result.png'))
+                        #Directory cleanup
+                        os.system('rm -rf ./output/*')
+                        return
                 await message.channel.send(message.author.name + ' Win!')
                 mainFTP(newPuzzle.fen.fen_array)
                 await message.channel.send(file=discord.File('./output/result.png'))
@@ -146,7 +226,36 @@ async def on_message(message):
             #Execute Counter Move
             newPuzzle.makeMove(newPuzzle.moves[newPuzzle.currentMove])
             #Check if Puzzle is complete
-            if (newPuzzle.currentMove == len(newPuzzle.moves)): 
+            if (newPuzzle.currentMove == len(newPuzzle.moves)):
+                if (blastMode):
+                    if (newBlast.currentPuzzle == newBlast.puzzleMax):
+                        #Blast complete announce winners
+                        blastMode = False
+                        await message.channel.send('Blast complete, Post Game Summary:')
+                        sortedScoreBoard = sorted(newBlast.scoreBoard, key=itemgetter('score'), reverse=True)
+                        summary = ''
+                        for i, scoreCard in enumerate(sortedScoreBoard):
+                            summary += '{position}. {user} : {score} {moves} \n'.format(position=str(i + 1), user=scoreCard['name'], score=scoreCard['score'], moves=pluralMoves(scoreCard['score']))
+                        await message.channel.send(summary) 
+                        return
+                    else:
+                        #Puzzle complete, blast continues
+                        await message.channel.send('Puzzle ' + str(newBlast.currentPuzzle) + ' complete, Next Puzzle: ')
+                        #Update Blast
+                        newBlast.currentPuzzle += 1
+                        #Get New Puzzle
+                        newPuzzle = Puzzle(getNewPuzzle())
+                        #Send Puzzle image and info
+                        mainFTP(newPuzzle.fen.fen_array)
+                        if (newPuzzle.color == 'w'):
+                            await message.channel.send('White to Move')
+                        else:
+                            await message.channel.send('Black to Move')
+                        await message.channel.send('Find ' + str(newPuzzle.movesToWin) + ' ' + pluralMoves(newPuzzle.movesToWin) + ' to complete the puzzle')
+                        await message.channel.send(file=discord.File('./output/result.png'))
+                        #Directory cleanup
+                        os.system('rm -rf ./output/*')
+                        return
                 await message.channel.send(message.author.name + ' Win!')
                 mainFTP(newPuzzle.fen.fen_array)
                 await message.channel.send(file=discord.File('./output/result.png'))
