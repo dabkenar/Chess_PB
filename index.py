@@ -81,6 +81,17 @@ async def on_message(message):
         os.system('rm -rf ./output/*')
     
     if (message.content.startswith('.blast')):
+        if (blastMode):
+            await message.channel.send('There is an active puzzle blast with ' + str(newBlast.puzzleMax - newBlast.currentPuzzle) + ' puzzles to go')
+            #Send Puzzle image and info
+            mainFTP(newPuzzle.fen.fen_array)
+            if (newPuzzle.color == 'w'):
+                await message.channel.send('White to Move')
+            else:
+                await message.channel.send('Black to Move')
+            await message.channel.send('Find ' + str(newPuzzle.movesToWin) + ' ' + pluralMoves(newPuzzle.movesToWin) + ' to complete the puzzle')
+            await message.channel.send(file=discord.File('./output/result.png'))
+            return
         try:
             blastSize = int(message.content.split(' ')[1])
         except:
