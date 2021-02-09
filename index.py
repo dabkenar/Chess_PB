@@ -100,6 +100,9 @@ async def on_message(message):
         if (blastSize < 3):
             await message.channel.send('Minimum blast size is 3 puzzles, try again')
             return
+        elif (blastSize > 10):
+            await message.channel.send('Maximum blast size is 10 puzzles, try again')
+            return
         #Enter the Puzzle Blasting Realm
         blastMode = True
         #Get number of puzzles and Initialize blast Session
