@@ -25,6 +25,7 @@ def compOneToInt(fen_segment):
     return condensed_segment
 
 def fenBoardArrToString(fen_Board_Arr):
+    print(fen_Board_Arr)
     fen_Board_str = ''
     for i in range(0, len(fen_Board_Arr) - 1):
         fen_Board_str += fen_Board_Arr[i] + '/'

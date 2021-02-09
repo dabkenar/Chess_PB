@@ -44,12 +44,12 @@ async def on_message(message):
     global tutorialMode
     global blastMode
     if (message.content.startswith('.help')):
+        blastMode = False
         tutorialMode = True
         await message.channel.send('Hello, I am the Chess Puzzle Blaster Discord bot.')
-        await message.channel.send('To play this puzzle you must suggest moves with the .move command and provide the initial square of the piece you would like to move, followed by its destination square. Remember, each square of the board can be identified using an alphanumerical system. Here is an image for reference:')
+        await message.channel.send('To play my puzzles you must suggest moves with the .move command and provide the initial square of the piece you would like to move, followed by its destination square. Remember, each square of the board can be identified using an alphanumerical system. Here is an image for reference:')
         await message.channel.send(file=discord.File('images/tutorial_board.png'))
         await message.channel.send('You can try this out with this puzzle right here. You can move your rook to b8 with the move command. The current location is b3 and the desired destination is b8 so your move command should look like: ".move b3b8" Try executing that command now')
-        # newPuzzle = Puzzle(tutorialPuzzle)
         mainFTP(tutorialPuzzle.fen.fen_array)
         await message.channel.send(file=discord.File('./output/result.png'))
 
@@ -62,7 +62,7 @@ async def on_message(message):
     if (message.content.startswith('.chess')):
         if (blastMode):
             await message.channel.send('There is an active puzzle blast with ' + str(newBlast.puzzleMax - newBlast.currentPuzzle) + ' puzzles to go')
-        if (not newPuzzle.complete):
+        elif (not newPuzzle.complete):
             await message.channel.send('You still have a puzzle to complete')
         else:
             #Generate New Puzzle
@@ -84,7 +84,7 @@ async def on_message(message):
         try:
             blastSize = int(message.content.split(' ')[1])
         except:
-            await message.channel.send('Puzzle Blast size is required: Use syntax .blast X')
+            await message.channel.send('Invalid blast command: Use syntax .blast X')
             return
         if (blastSize < 3):
             await message.channel.send('Minimum blast size is 3 puzzles, try again')
@@ -116,7 +116,7 @@ async def on_message(message):
             return
         if (tutorialMode):
             if (processTutorialMove(move) == 1):
-                await message.channel.send('Nice job. As you can see you have moved your rook to b8 and your opponent has moved their pawn to a5. Whenever you enter the correct move, I will execute it and your opponents response move. Then I will send you a new image of the board. Now try moving your bishop to g7. This time you\'ll have to figure out the command on your own.')
+                await message.channel.send('Nice job. As you can see you have moved your rook to b8 and your opponent has moved their pawn to a5. Whenever you enter the correct move, I will execute it and your opponents response move, then I will send you a new image of the board. Now try moving your bishop to g7. This time you\'ll have to figure out the command on your own.')
                 #Execute User Move
                 tutorialPuzzle.makeMove(tutorialPuzzle.moves[tutorialPuzzle.currentMove])
                 #Execute Counter Move
@@ -162,10 +162,10 @@ async def on_message(message):
                 await message.channel.send('Invalid Move Syntax')
                 return
 
-            
         if (newPuzzle.complete):
             await message.channel.send('No Active puzzle, use the .chess command to request another')
             return
+
         if (not isValidMove(move)):
             await message.channel.send('Invalid Move Syntax')
             return
@@ -195,7 +195,7 @@ async def on_message(message):
                         sortedScoreBoard = sorted(newBlast.scoreBoard, key=itemgetter('score'), reverse=True)
                         summary = ''
                         for i, scoreCard in enumerate(sortedScoreBoard):
-                            summary += '{position}. {user} : {score} {moves} \n'.format(position=str(i + 1), user=scoreCard['name'], score=scoreCard['score'], moves=pluralMoves(scoreCard['score']))
+                            summary += '{position}. {user} found {score} {moves} \n'.format(position=str(i + 1), user=scoreCard['name'], score=scoreCard['score'], moves=pluralMoves(scoreCard['score']))
                         await message.channel.send(summary) 
                         return
                     else:
@@ -235,7 +235,7 @@ async def on_message(message):
                         sortedScoreBoard = sorted(newBlast.scoreBoard, key=itemgetter('score'), reverse=True)
                         summary = ''
                         for i, scoreCard in enumerate(sortedScoreBoard):
-                            summary += '{position}. {user} : {score} {moves} \n'.format(position=str(i + 1), user=scoreCard['name'], score=scoreCard['score'], moves=pluralMoves(scoreCard['score']))
+                            summary += '{position}. {user} found {score} {moves} \n'.format(position=str(i + 1), user=scoreCard['name'], score=scoreCard['score'], moves=pluralMoves(scoreCard['score']))
                         await message.channel.send(summary) 
                         return
                     else:

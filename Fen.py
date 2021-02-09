@@ -34,7 +34,7 @@ class Fen:
 
         if (move_LOC[1] == move_DES[1]):
             print('same rank case')
-            #Remove piece charactr from destination segment and replace with 1
+            #Remove piece character from destination segment and replace with 1
             interm_expanded_orig_FEN_DES = expanded_orig_FEN_DES[:moveHelperFunctions.letterToInt(move_LOC[0])] + '1' + expanded_orig_FEN_DES[moveHelperFunctions.letterToInt(move_LOC[0]) + 1:]
             #Replace ‘1’ or piece character in DES with LOC piece character or PP character, if applicable
             new_expanded_orig_FEN_DES = interm_expanded_orig_FEN_DES[:moveHelperFunctions.letterToInt(move_DES[0])] + moving_piece + interm_expanded_orig_FEN_DES[moveHelperFunctions.letterToInt(move_DES[0]) + 1:]
@@ -43,7 +43,6 @@ class Fen:
             #Update FEN Rank Segments
             new_FEN_Board_ARR = orig_FEN_Board.split('/')
             new_FEN_Board_ARR[moveHelperFunctions.rankToIndex(int(move_DES[1]))] = condensed_new_FEN_DES
-
         else:
             #Remove piece character from location segment and replace with 1
             new_expanded_orig_FEN_LOC = expanded_orig_FEN_LOC[:moveHelperFunctions.letterToInt(move_LOC[0])] + '1' + expanded_orig_FEN_LOC[moveHelperFunctions.letterToInt(move_LOC[0]) + 1:]
@@ -56,18 +55,15 @@ class Fen:
                 print('normal move')
                 new_expanded_orig_FEN_DES = expanded_orig_FEN_DES[:moveHelperFunctions.letterToInt(move_DES[0])] + moving_piece + expanded_orig_FEN_DES[moveHelperFunctions.letterToInt(move_DES[0]) + 1:]
 
-                #Condense Component 1 strings to Integers
-                condensed_new_FEN_LOC = moveHelperFunctions.compOneToInt(new_expanded_orig_FEN_LOC)
-                condensed_new_FEN_DES = moveHelperFunctions.compOneToInt(new_expanded_orig_FEN_DES)
+            #Condense Component 1 strings to Integers
+            condensed_new_FEN_LOC = moveHelperFunctions.compOneToInt(new_expanded_orig_FEN_LOC)
+            condensed_new_FEN_DES = moveHelperFunctions.compOneToInt(new_expanded_orig_FEN_DES)
 
-                #Update FEN Rank Segments
-                new_FEN_Board_ARR = orig_FEN_Board.split('/')
-                new_FEN_Board_ARR[moveHelperFunctions.rankToIndex(int(move_LOC[1]))] = condensed_new_FEN_LOC
-                new_FEN_Board_ARR[moveHelperFunctions.rankToIndex(int(move_DES[1]))] = condensed_new_FEN_DES
+            #Update FEN Rank Segments
+            new_FEN_Board_ARR = orig_FEN_Board.split('/')
+            new_FEN_Board_ARR[moveHelperFunctions.rankToIndex(int(move_LOC[1]))] = condensed_new_FEN_LOC
+            new_FEN_Board_ARR[moveHelperFunctions.rankToIndex(int(move_DES[1]))] = condensed_new_FEN_DES
 
-
-        # new_FEN = []
-        # new_FEN.append(moveHelperFunctions.fenBoardArrToString(new_FEN_Board_ARR))
         self.board = moveHelperFunctions.fenBoardArrToString(new_FEN_Board_ARR)
         
         #Invert side to move

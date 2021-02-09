@@ -2,6 +2,7 @@ from Fen import Fen
 
 class Puzzle:
     def __init__(self, puzzleArray_LC):
+        print(puzzleArray_LC)
         self.fen = Fen(puzzleArray_LC[1].split(' ')) #Fen as Fen object
         self.moves = puzzleArray_LC[2].split(' ') #Puzzle moves as Array
         self.currentMove = 0 #Index for move array
