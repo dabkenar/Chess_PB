@@ -84,7 +84,7 @@ async def on_message(message):
         try:
             blastSize = int(message.content.split(' ')[1])
         except:
-            await message.channel.send('Invalid blast command: Use syntax .blast X')
+            await message.channel.send('Invalid blast command: Use syntax .blast X to specify the number of puzzles in your blast')
             return
         if (blastSize < 3):
             await message.channel.send('Minimum blast size is 3 puzzles, try again')
